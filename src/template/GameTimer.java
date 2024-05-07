@@ -249,8 +249,19 @@ public class GameTimer extends AnimationTimer {
 	private void addFishes(int n) {
 		Random r = new Random();
 		for (int i = 0; i < n; i++) {
-			int x = r.nextInt(191) + 540;
-			int y = r.nextInt(551) + 30;
+			double x;
+			double y;
+			if (this.ship.getX() < (GameStage.WINDOW_WIDTH / 2)) {
+				x = r.nextInt((int)GameStage.WINDOW_WIDTH / 2) + this.ship.getX();
+			}else {
+				x = this.ship.getX() - r.nextInt((int)GameStage.WINDOW_WIDTH / 2);
+			}
+			
+			if (this.ship.getY() < (GameStage.WINDOW_HEIGHT / 2)) {
+				y = r.nextInt((int)GameStage.WINDOW_HEIGHT / 2) + this.ship.getY();
+			}else {
+				y = this.ship.getY() - r.nextInt((int)GameStage.WINDOW_HEIGHT / 2);
+			}
 			Fish fish = new Fish(x, y, 1);
 			this.fishes.add(fish);
 		}

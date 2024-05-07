@@ -19,7 +19,7 @@ public class Fish extends Sprite {
 	private int damage;
 	private int type;
 	
-	public Fish(int positionX, int positionY, int type) { //Constructor
+	public Fish(double positionX, double positionY, int type) { //Constructor
 		super(positionX, positionY);
 		this.alive = true;
 		this.orientation = 'W';
