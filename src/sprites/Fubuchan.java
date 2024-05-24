@@ -16,6 +16,7 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 	private int strength; //Instance attributes
 	private boolean alive; 
 	private ArrayList<Bullet> bullets;
+	private int ammo;
 	private int score;
 	private boolean invincible;
 	
@@ -31,6 +32,7 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 		this.score = 0;
 		this.invincible = false;
 		this.orientation = 'E';
+		this.ammo = 10;
 	}
 	
 	public void move() {
@@ -46,22 +48,30 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 		this.dY = 0;
 	}
 	
+	public void reload() {
+		this.ammo = 10;
+	}
+	
 	public void shoot(double mouseX, double mouseY) {
 		// getting position
-		int x = (int) (this.positionX + Fubuchan.SHIP.getWidth() - 10);
-		int y = (int) (this.positionY + Fubuchan.SHIP.getHeight()/3);
-		
-		double m = (mouseY - y)/(mouseX - x);
-		
-		char orientation;
-		
-		if (mouseX > x) {
-			orientation = 'E';
-		}else {
-			orientation = 'W';
+		if (this.ammo > 0) {
+			int x = (int) (this.positionX + Fubuchan.SHIP.getWidth() - 10);
+			int y = (int) (this.positionY + Fubuchan.SHIP.getHeight()/3);
+			
+			double m = (mouseY - y)/(mouseX - x);
+			
+			char orientation;
+			
+			if (mouseX > x) {
+				orientation = 'E';
+			}else {
+				orientation = 'W';
+			}
+			
+			this.bullets.add(new Bullet(x, y, m, orientation, this));
+			
+			this.ammo -=1;
 		}
-		
-		this.bullets.add(new Bullet(x, y, m, orientation, this));
 	}
 	
 	private void checkStrength() {
@@ -103,8 +113,6 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 	public char getOrientation() {
 		return this.orientation;
 	}
-	
-	public 
 	
 	//Setters
 	void setStrength(int strength) {

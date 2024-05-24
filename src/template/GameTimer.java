@@ -34,6 +34,10 @@ public class GameTimer extends AnimationTimer {
 	private long powerUpDelay;
 	private long bigFishDelay;
 	private boolean win;
+	private boolean reloading;
+	private long reloadingTime;
+	private int wave;
+	private boolean increaseDifficulty;
 
 	GameTimer(GraphicsContext gc, Scene scene, GameStage gs) {
 		this.gc = gc;
@@ -45,6 +49,10 @@ public class GameTimer extends AnimationTimer {
 		this.fishDelay = this.powerUpDelay = this.bigFishDelay = System.nanoTime();
 		this.inGameTime = 0;
 		this.win = false;
+		this.reloading = false;
+		this.reloadingTime = 0;
+		this.wave = 0;
+		this.increaseDifficulty = false;
 		
 		//Initialization
 		this.init();
@@ -102,6 +110,11 @@ public class GameTimer extends AnimationTimer {
 					ship.setdX(Fubuchan.SHIP_SPEED);
 					ship.setOrientation('E');
 				}
+				
+				if (code == KeyCode.R) {
+					reloadingTime = System.nanoTime();
+					reloading = true;
+				}
 				// Logging movements
 				System.out.println(code + " key pressed.");
 				
@@ -121,8 +134,6 @@ public class GameTimer extends AnimationTimer {
 		this.scene.setOnMouseMoved(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent e) {
 				crosshair.setdXdY(e.getX(), e.getY());
-			
-				System.out.println("MOUSE X : " + e.getX() + " MOUSE Y : " + e.getY());
 			}
 		});
 		
@@ -180,7 +191,7 @@ public class GameTimer extends AnimationTimer {
 		// adding wave of fishes every 5s
 		double fishDelay = (now - this.fishDelay) / 1000000000.0;
 		if (fishDelay > 5) {
-			this.addFishes(3);
+			this.addFishes(3 + (wave * 2));
 			this.fishDelay = System.nanoTime();
 		}
 		
@@ -198,8 +209,25 @@ public class GameTimer extends AnimationTimer {
 			this.powerUpDelay = System.nanoTime();
 		}
 		
+		if (this.reloading == true) {
+			if ((now - this.reloadingTime) / 1000000000.0 >3) {
+				this.ship.reload();
+				this.reloading = false;
+			}
+		}
+		
+		if (this.inGameTime > 0 && this.inGameTime % 60 == 0) {
+			if (this.increaseDifficulty == false) {
+				this.wave += 1;
+				System.out.println(wave);
+				this.increaseDifficulty = true;
+			}
+		}else {
+			this.increaseDifficulty = false;
+		}
+		
 		// checking if the game is over
-		if (this.inGameTime > 60 ) {
+		if (this.inGameTime > 180 ) {
 			this.stop();
 			this.win = true;
 			this.gs.setGameOver();
