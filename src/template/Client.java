@@ -1,44 +1,81 @@
 package template;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+import java.util.Scanner;
 
-import java.io.*; 
-import java.net.*; 
-import java.util.Scanner; 
-  
-public class Client { 
-    private static final String SERVER_ADDRESS = "localhost"; 
-    private static final int SERVER_PORT = 1234; 
-  
-    public static void main(String[] args) { 
-        try { 
-            Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT); 
-            System.out.println("Connected to the chat server!"); 
-  
-            // Setting up input and output streams 
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true); 
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
-  
-            // Start a thread to handle incoming messages 
-            new Thread(() -> { 
-                try { 
-                    String serverResponse; 
-                    while ((serverResponse = in.readLine()) != null) { 
-                        System.out.println(serverResponse); 
-                    } 
-                } catch (IOException e) { 
-                    e.printStackTrace(); 
-                } 
-            }).start(); 
-  
-            // Read messages from the console and send to the server 
-            Scanner scanner = new Scanner(System.in); 
-            String userInput; 
-            while (true) { 
-                userInput = scanner.nextLine(); 
-                out.println(userInput); 
-            } 
-             
-        } catch (IOException e) { 
-            e.printStackTrace(); 
-        } 
-    } 
-} 
+public class Client implements Runnable {
+
+    private Socket socket;
+    private BufferedReader bufferedReader;
+    private BufferedWriter bufferedWriter;
+
+    public Client(String serverAdd,final int port) {
+        try {
+            socket = new Socket(serverAdd, port);
+            this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            setUsername();
+            startReadMessageLoop();
+            startSendMessageLoop();
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setUsername() {
+        System.out.print("Enter your username: ");
+        try (Scanner scanner = new Scanner(System.in)) {
+            bufferedWriter.write(scanner.nextLine());
+            bufferedWriter.newLine();
+            bufferedWriter.flush();
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Sent username information.");
+    }
+
+    private void startSendMessageLoop() {
+        try (Scanner scanner = new Scanner(System.in)) {
+            while (socket.isConnected()) {
+                bufferedWriter.write(scanner.nextLine());
+                bufferedWriter.newLine();
+                bufferedWriter.flush();
+            }
+            System.out.println("Send message loop done.");
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        // new Thread(new Runnable() {
+        // @Override
+        // public void run() {
+        // }
+        // }).start();
+    }
+
+    private void startReadMessageLoop() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while (socket.isConnected()) {
+                        System.out.println(bufferedReader.readLine());
+                    }
+                    System.out.println("Read message loop done.");
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
+	}
+}
