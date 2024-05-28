@@ -38,6 +38,7 @@ public class GameTimer extends AnimationTimer {
 	private long reloadingTime;
 	private int wave;
 	private boolean increaseDifficulty;
+	private int playerId;
 
 	GameTimer(GraphicsContext gc, Scene scene, GameStage gs) {
 		this.gc = gc;
@@ -53,6 +54,7 @@ public class GameTimer extends AnimationTimer {
 		this.reloadingTime = 0;
 		this.wave = 0;
 		this.increaseDifficulty = false;
+		this.playerId = 0;
 		
 		//Initialization
 		this.init();
@@ -68,6 +70,8 @@ public class GameTimer extends AnimationTimer {
 		// Rendering visual changes
 		this.render();
 	}
+	
+	
 	
 	// Initialize method
 	public void init() {
@@ -210,7 +214,7 @@ public class GameTimer extends AnimationTimer {
 		}
 		
 		if (this.reloading == true) {
-			if ((now - this.reloadingTime) / 1000000000.0 >3) {
+			if ((now - this.reloadingTime) / 1000000000.0 >1) {
 				this.ship.reload();
 				this.reloading = false;
 			}

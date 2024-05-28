@@ -32,7 +32,7 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 		this.score = 0;
 		this.invincible = false;
 		this.orientation = 'E';
-		this.ammo = 10;
+		this.ammo = 20;
 	}
 	
 	public void move() {
