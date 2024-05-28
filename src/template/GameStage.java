@@ -31,6 +31,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import java.net.DatagramSocket;
 
 public class GameStage {
 	// Class Attributes
@@ -65,6 +66,7 @@ public class GameStage {
 	private GameTimer gametimer;
 	private GraphicsContext gc;
 	private Scene scene;
+	private InetAddress address;
 	private String serverAdd;
 	
 	// Constructor
@@ -75,6 +77,15 @@ public class GameStage {
 		this.canvas = new Canvas(GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT);
 		this.gc = this.canvas.getGraphicsContext2D();
 		this.root.getChildren().add(this.canvas);
+		try{
+			this.address = InetAddress.getLocalHost();
+		}catch(Exception e){
+			System.err.println(e);
+		}
+		
+		this.serverAdd = address.getHostAddress();
+
+		System.out.println(this.serverAdd);
 	}
 	
 	// Methods
@@ -376,7 +387,7 @@ public class GameStage {
 		Scene gameScene = new Scene(root);
 		
 		// Starting the game
-		this.gametimer = new GameTimer(gc, gameScene, this);
+		this.gametimer = new GameTimer(gc, gameScene, this, this.serverAdd);
 		this.gametimer.start();
 		
 		
@@ -391,7 +402,7 @@ public class GameStage {
 		Scene gameScene = new Scene(root);
 		
 		// Starting the game
-		this.gametimer = new GameTimer(gc, gameScene, this);
+		this.gametimer = new GameTimer(gc, gameScene, this, this.serverAdd);
 		this.gametimer.start();
 		
 				

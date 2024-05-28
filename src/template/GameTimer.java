@@ -3,6 +3,8 @@ package template;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
+import java.net.InetAddress;
+import java.net.DatagramSocket;
 
 import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
@@ -34,16 +36,14 @@ public class GameTimer extends AnimationTimer {
 	private long powerUpDelay;
 	private long bigFishDelay;
 	private boolean win;
-<<<<<<< HEAD
 	private boolean reloading;
 	private long reloadingTime;
 	private int wave;
 	private boolean increaseDifficulty;
 	private int playerId;
-=======
->>>>>>> d90cbef8943d86af2e71226cfbdbec481e6bd621
+	private String address;
 
-	GameTimer(GraphicsContext gc, Scene scene, GameStage gs) {
+	GameTimer(GraphicsContext gc, Scene scene, GameStage gs, String address) {
 		this.gc = gc;
 		this.gs = gs;
 		this.scene = scene;
@@ -53,19 +53,19 @@ public class GameTimer extends AnimationTimer {
 		this.fishDelay = this.powerUpDelay = this.bigFishDelay = System.nanoTime();
 		this.inGameTime = 0;
 		this.win = false;
-<<<<<<< HEAD
 		this.reloading = false;
 		this.reloadingTime = 0;
 		this.wave = 0;
 		this.increaseDifficulty = false;
 		this.playerId = 0;
-=======
->>>>>>> d90cbef8943d86af2e71226cfbdbec481e6bd621
+		this.address = address;
 		
 		//Initialization
 		this.init();
 		//Process Input
 		this.processInput();
+
+		System.out.println(address);
 	}
 	
 	@Override
@@ -216,7 +216,6 @@ public class GameTimer extends AnimationTimer {
 			this.powerUpDelay = System.nanoTime();
 		}
 		
-<<<<<<< HEAD
 		if (this.reloading == true) {
 			if ((now - this.reloadingTime) / 1000000000.0 >1) {
 				this.ship.reload();
@@ -234,8 +233,6 @@ public class GameTimer extends AnimationTimer {
 			this.increaseDifficulty = false;
 		}
 		
-=======
->>>>>>> d90cbef8943d86af2e71226cfbdbec481e6bd621
 		// checking if the game is over
 		if (this.inGameTime > 60 ) {
 			this.stop();
@@ -407,4 +404,5 @@ public class GameTimer extends AnimationTimer {
 	public boolean isWin() {
 		return this.win;
 	}
+
 }
