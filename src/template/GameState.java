@@ -39,6 +39,7 @@ public class GameState {
 		}
 		return retval;
 	}
+
 	
 	/**
 	 * Returns the map

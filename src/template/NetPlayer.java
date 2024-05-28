@@ -8,6 +8,7 @@ public class NetPlayer {
 	private int port;
 	private String username;
 	private int x,y;
+	private String message;
 	
 	public NetPlayer(String username,InetAddress address, int port){
 		this.address = address;
@@ -82,6 +83,16 @@ public class NetPlayer {
 		retval+=username+" ";
 		retval+=x+" ";
 		retval+=y;
+		return retval;
+	}
+	/**
+	 * String representation. used for transfer over the network
+	 */
+	public String messageToString(){
+		String retval="";
+		retval+="MESSAGE ";
+		retval+=username+" ";
+		retval+=message;
 		return retval;
 	}
 }

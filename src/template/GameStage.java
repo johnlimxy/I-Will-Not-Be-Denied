@@ -56,16 +56,20 @@ public class GameStage {
 	
 	//net
 	public final static int DEFAULT_PORT_NUMBER = 1234;
+	//Basically connection indicators
+	public static final int GAME_START=0;
+	public static final int IN_PROGRESS=1;
+	public static final int GAME_END = 2;
+	public static final int WAITING_FOR_PLAYERS=3;
 	
 	// Instance attributes
-	public String username;
 	private Stage stage;
 	private Group root;
 	private Canvas canvas;
 	private GameTimer gametimer;
+	private WaitingLobby waitinglobby;
 	private GraphicsContext gc;
 	private Scene scene;
-	private String serverAdd;
 	
 	// Constructor
 	public GameStage() {
@@ -280,21 +284,29 @@ public class GameStage {
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		gc.drawImage(GameStage.BG, 0, 0);
 		
-		//textbox for username
-		TextField username = new TextField();
-		Label userLabel = new Label("Username: ");
-		this.username = username.getText();
 		
-		//display for server ip add
 		try {
+			//textbox for username
+			TextField username = new TextField();
+			Label userLabel = new Label("Username: ");
+			String name = username.getText();
+			//display for server ip add
 			String ipAdd = InetAddress.getLocalHost().getHostAddress();
 			Text ipAddress = new Text("Server Address: "+ ipAdd);
 			ImageView startGame = new ImageView();
 			startGame.setImage(GameStage.NEW_GAME); //TODO: Baguhin yung image
+			System.out.print("Trying to connect "+ipAdd+ name+"\n");
 			startGame.setOnMouseClicked(new EventHandler<MouseEvent>() { 
 				@Override
 			     public void handle(MouseEvent event) {
-					stage.setScene(initServerGame(stage));
+					new GameServer(2); //initialize server
+					try {
+						
+						stage.setScene(initServerGame(stage, ipAdd, "Asha"));
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 			        event.consume();
 			     }
 			});
@@ -331,18 +343,26 @@ public class GameStage {
 		//textbox for username
 		TextField username = new TextField();
 		Label userLabel = new Label("Username: ");
-		this.username = username.getText();
+		String uname = username.getText();
 		
 		//textbox for server add
 		TextField serverAdd = new TextField();
 		Label serverLabel = new Label("Server Address: ");
-		this.serverAdd = serverAdd.getText();
+		String serverA = serverAdd.getText();
 		ImageView startGame = new ImageView();
+		System.out.print("Trying to connect" + uname);
 		startGame.setImage(GameStage.NEW_GAME); //TODO: Baguhin yung image
 		startGame.setOnMouseClicked(new EventHandler<MouseEvent>() { 
 			@Override
 		     public void handle(MouseEvent event) {
-				 stage.setScene(initClientGame(stage));
+				 try {
+					System.out.print("Trying to connect" + uname);
+					stage.setScene(initServerGame(stage, "192.168.56.1", "Mae" ));
+					
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		         event.consume();
 		     }
 		});
@@ -367,7 +387,7 @@ public class GameStage {
 	
 
 	
-	public Scene initServerGame(Stage stage) {
+	public Scene initServerGame(Stage stage, String server,String name) throws Exception {
 		// Setting up the game scene
 		StackPane root = new StackPane();
 		Canvas canvas = new Canvas(GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT);
@@ -376,13 +396,13 @@ public class GameStage {
 		Scene gameScene = new Scene(root);
 		
 		// Starting the game
-		this.gametimer = new GameTimer(gc, gameScene, this);
-		this.gametimer.start();
+		this.waitinglobby = new WaitingLobby(stage,server,name);
+		this.waitinglobby.run();
 		
 		
 		return gameScene;
 	}
-	public Scene initClientGame(Stage stage) {
+	public Scene initClientGame(Stage stage, String server,String name) throws Exception {
 		// Setting up the game scene
 		StackPane root = new StackPane();
 		Canvas canvas = new Canvas(GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT);
@@ -391,7 +411,7 @@ public class GameStage {
 		Scene gameScene = new Scene(root);
 		
 		// Starting the game
-		this.gametimer = new GameTimer(gc, gameScene, this);
+		this.gametimer = new GameTimer(gc, gameScene, this, server, name);
 		this.gametimer.start();
 		
 				
@@ -408,7 +428,7 @@ public class GameStage {
 		transition.setOnFinished(new EventHandler<ActionEvent>() {
 
 			public void handle(ActionEvent arg0) {
-				GameOverStage gameover = new GameOverStage(username);
+				GameOverStage gameover = new GameOverStage();
 				gameover.setStage(n,stage,gametimer);
 			}
 		});

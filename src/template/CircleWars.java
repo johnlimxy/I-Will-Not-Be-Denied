@@ -149,6 +149,7 @@ public class CircleWars extends JPanel implements Runnable{
 			}else if (!connected){
 				System.out.println("Connecting..");				
 				send("CONNECT "+name);
+				System.out.print("Trying to connect" + name);
 			}else if (connected){
 				offscreen.getGraphics().clearRect(0, 0, 640, 480);
 				if (serverData.startsWith("PLAYER")){

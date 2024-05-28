@@ -48,7 +48,7 @@ public class GameOverStage {
 	
 
 
-	GameOverStage(String username){
+	GameOverStage(){
 		
 		this.username = username;
 		this.pane = new StackPane();

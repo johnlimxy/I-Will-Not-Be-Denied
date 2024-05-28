@@ -1,5 +1,8 @@
 package template;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
@@ -20,7 +23,10 @@ import sprites.Fubuchan;
 import sprites.Sash;
 import sprites.PowerUp;
 
-public class GameTimer extends AnimationTimer {
+/**
+ * Client ata dapat to???
+ */
+public class GameTimer extends AnimationTimer{
 	private GraphicsContext gc;
 	private Scene scene;
 	private ArrayList<Fish> fishes;
@@ -34,8 +40,27 @@ public class GameTimer extends AnimationTimer {
 	private long powerUpDelay;
 	private long bigFishDelay;
 	private boolean win;
+	
+	double prevX,prevY,prevXM,prevYM,x, y;
+	String server, name;
+	/**
+	 * Player name of others
+	 */
+	String pname;
+	/**
+	 * Flag to indicate whether this player has connected or not
+	 */
+	boolean connected=false;
+	/**
+	 * get a datagram socket
+	 */
+    DatagramSocket socket = new DatagramSocket();
+    /**
+     * Placeholder for data received from server
+     */
+	String serverData;
 
-	GameTimer(GraphicsContext gc, Scene scene, GameStage gs) {
+	GameTimer(GraphicsContext gc, Scene scene, GameStage gs, String server,String name) throws Exception{
 		this.gc = gc;
 		this.gs = gs;
 		this.scene = scene;
@@ -46,10 +71,34 @@ public class GameTimer extends AnimationTimer {
 		this.inGameTime = 0;
 		this.win = false;
 		
+		this.server = server;
+		this.name = name;
+		//set some timeout for the socket
+		socket.setSoTimeout(100);
+		
+		Thread t=new Thread(this); //idk yet
+		
+		
+				
 		//Initialization
 		this.init();
 		//Process Input
 		this.processInput();
+	}
+	
+	//net methods
+	/**
+	 * Helper method for sending data to server
+	 * @param msg
+	 */
+	public void send(String msg){
+		try{
+			byte[] buf = msg.getBytes();
+        	InetAddress address = InetAddress.getByName(server);
+        	DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 1234);
+        	socket.send(packet);
+        }catch(Exception e){}
+		
 	}
 	
 	@Override
@@ -81,6 +130,7 @@ public class GameTimer extends AnimationTimer {
 		this.scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent e) {
 				KeyCode code = e.getCode();
+				prevX=ship.getX();prevY=ship.getY();
 				
 				// Possible movements
 				if (code == KeyCode.W) {
@@ -105,6 +155,10 @@ public class GameTimer extends AnimationTimer {
 				// Logging movements
 				System.out.println(code + " key pressed.");
 				
+				if (prevX != x || prevY != y){
+					send("PLAYER "+name+" "+x+" "+y);
+				}
+				
 
 			}
 		});
@@ -123,6 +177,9 @@ public class GameTimer extends AnimationTimer {
 				crosshair.setdXdY(e.getX(), e.getY());
 			
 				System.out.println("MOUSE X : " + e.getX() + " MOUSE Y : " + e.getY());
+				if (prevXM != e.getX() || prevYM != e.getY()){
+					send("PLAYER MOUSE"+name+" "+e.getX()+" "+e.getX());
+				}
 			}
 		});
 		
@@ -369,4 +426,6 @@ public class GameTimer extends AnimationTimer {
 	public boolean isWin() {
 		return this.win;
 	}
+
+
 }

@@ -164,6 +164,12 @@ public class GameServer implements Runnable{
 						  game.update(pname, player);
 						  //Send to all the updated game state
 						  broadcast(game.toString());
+					  }else if (playerData.startsWith("MESSAGE")){
+						  String[] playerInfo = playerData.split(",,");
+						  String pname = playerInfo[1];
+						  broadcast(game.toString());
+						  
+						  
 					  }
 					  break;
 			}				  
