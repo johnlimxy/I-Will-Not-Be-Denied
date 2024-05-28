@@ -34,11 +34,14 @@ public class GameTimer extends AnimationTimer {
 	private long powerUpDelay;
 	private long bigFishDelay;
 	private boolean win;
+<<<<<<< HEAD
 	private boolean reloading;
 	private long reloadingTime;
 	private int wave;
 	private boolean increaseDifficulty;
 	private int playerId;
+=======
+>>>>>>> d90cbef8943d86af2e71226cfbdbec481e6bd621
 
 	GameTimer(GraphicsContext gc, Scene scene, GameStage gs) {
 		this.gc = gc;
@@ -50,11 +53,14 @@ public class GameTimer extends AnimationTimer {
 		this.fishDelay = this.powerUpDelay = this.bigFishDelay = System.nanoTime();
 		this.inGameTime = 0;
 		this.win = false;
+<<<<<<< HEAD
 		this.reloading = false;
 		this.reloadingTime = 0;
 		this.wave = 0;
 		this.increaseDifficulty = false;
 		this.playerId = 0;
+=======
+>>>>>>> d90cbef8943d86af2e71226cfbdbec481e6bd621
 		
 		//Initialization
 		this.init();
@@ -114,11 +120,6 @@ public class GameTimer extends AnimationTimer {
 					ship.setdX(Fubuchan.SHIP_SPEED);
 					ship.setOrientation('E');
 				}
-				
-				if (code == KeyCode.R) {
-					reloadingTime = System.nanoTime();
-					reloading = true;
-				}
 				// Logging movements
 				System.out.println(code + " key pressed.");
 				
@@ -138,6 +139,8 @@ public class GameTimer extends AnimationTimer {
 		this.scene.setOnMouseMoved(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent e) {
 				crosshair.setdXdY(e.getX(), e.getY());
+			
+				System.out.println("MOUSE X : " + e.getX() + " MOUSE Y : " + e.getY());
 			}
 		});
 		
@@ -195,7 +198,7 @@ public class GameTimer extends AnimationTimer {
 		// adding wave of fishes every 5s
 		double fishDelay = (now - this.fishDelay) / 1000000000.0;
 		if (fishDelay > 5) {
-			this.addFishes(3 + (wave * 2));
+			this.addFishes(3);
 			this.fishDelay = System.nanoTime();
 		}
 		
@@ -213,6 +216,7 @@ public class GameTimer extends AnimationTimer {
 			this.powerUpDelay = System.nanoTime();
 		}
 		
+<<<<<<< HEAD
 		if (this.reloading == true) {
 			if ((now - this.reloadingTime) / 1000000000.0 >1) {
 				this.ship.reload();
@@ -230,11 +234,13 @@ public class GameTimer extends AnimationTimer {
 			this.increaseDifficulty = false;
 		}
 		
+=======
+>>>>>>> d90cbef8943d86af2e71226cfbdbec481e6bd621
 		// checking if the game is over
-		if (this.inGameTime > 180 ) {
+		if (this.inGameTime > 60 ) {
 			this.stop();
 			this.win = true;
-			this.gs.setGameOver();
+			this.gs.setGameOver(1);
 		}
 		
 		// checking collisions
@@ -350,7 +356,7 @@ public class GameTimer extends AnimationTimer {
 				// if ship is destroyed, end the game
 				if (!this.ship.isAlive()) {
 					this.stop();
-					this.gs.setGameOver();
+					this.gs.setGameOver(0);
 					System.out.println("Game Over");
 				}
 			}

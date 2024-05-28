@@ -3,13 +3,26 @@ package template;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.scene.Scene;
+
+import java.io.*; 
+import java.net.*;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+
 import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -17,6 +30,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
 public class GameStage {
 	// Class Attributes
@@ -35,16 +49,23 @@ public class GameStage {
 	public final static Image WIN = new Image("assets/win.png");
 	public final static Image LOSE = new Image("assets/gameover.png");
 	public final static Image ICON = new Image("assets/icon.png");
-	public final static double WINDOW_WIDTH = BG.getWidth();
-	public final static double WINDOW_HEIGHT = BG.getHeight();
+//	public final static double WINDOW_WIDTH = BG.getWidth();
+//	public final static double WINDOW_HEIGHT = BG.getHeight();
+	public final static double WINDOW_WIDTH = 800;
+	public final static double WINDOW_HEIGHT = 600;
+	
+	//net
+	public final static int DEFAULT_PORT_NUMBER = 1234;
 	
 	// Instance attributes
+	public String username;
 	private Stage stage;
 	private Group root;
 	private Canvas canvas;
 	private GameTimer gametimer;
 	private GraphicsContext gc;
 	private Scene scene;
+	private String serverAdd;
 	
 	// Constructor
 	public GameStage() {
@@ -78,7 +99,7 @@ public class GameStage {
 		newGame.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 		     public void handle(MouseEvent event) {
-				 stage.setScene(initGame(stage));
+				 stage.setScene(serverGameRoom(stage));
 		         event.consume();
 		     }
 		});
@@ -90,6 +111,25 @@ public class GameStage {
 				newGame.setImage(GameStage.NEW_GAME);
 			}
 		});
+		
+		ImageView joinGame = new ImageView();
+		joinGame.setImage(GameStage.NEW_GAME);
+		joinGame.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+		     public void handle(MouseEvent event) {
+				 stage.setScene(clientGameRoom(stage));
+		         event.consume();
+		     }
+		});
+		
+		joinGame.hoverProperty().addListener((observable) -> {
+			if (joinGame.isHover()) {
+				joinGame.setImage(GameStage.NEW_GAME_HOVER);
+			} else {
+				joinGame.setImage(GameStage.NEW_GAME);
+			}
+		});
+		
 		ImageView help = new ImageView();
 		help.setImage(GameStage.HELP);
 		help.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -126,9 +166,9 @@ public class GameStage {
 		});
 		VBox vbox = new VBox(25);
 		vbox.setAlignment(Pos.CENTER);
-		vbox.getChildren().addAll(newGame, help, about);
+		vbox.getChildren().addAll(newGame,joinGame, help, about);
 		vbox.setLayoutX(GameStage.WINDOW_WIDTH / 2 - GameStage.NEW_GAME.getWidth() / 2);
-		vbox.setLayoutY(GameStage.WINDOW_HEIGHT  * 3 / 4 - (GameStage.NEW_GAME.getHeight() + GameStage.HELP.getHeight() + GameStage.ABOUT.getHeight() + 40) / 2 - 30);
+		vbox.setLayoutY(GameStage.WINDOW_HEIGHT  * 3 / 4 - ((GameStage.NEW_GAME.getHeight()*2) + GameStage.HELP.getHeight() + GameStage.ABOUT.getHeight() + 40) / 2 - 30);
 		
 		// Animations
 		FadeTransition fadein = new FadeTransition(Duration.millis(1500), logo);
@@ -230,7 +270,104 @@ public class GameStage {
 		return new Scene(root);
 	}
 	
-	public Scene initGame(Stage stage) {
+	public Scene serverGameRoom(Stage stage) {
+		// Setting up the Server scene
+		Pane root = new Pane();
+		Button startbtn = new Button("Start Game");
+				
+		// Background
+		Canvas canvas = new Canvas(GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT);
+		GraphicsContext gc = canvas.getGraphicsContext2D();
+		gc.drawImage(GameStage.BG, 0, 0);
+		
+		//textbox for username
+		TextField username = new TextField();
+		Label userLabel = new Label("Username: ");
+		this.username = username.getText();
+		
+		//display for server ip add
+		try {
+			String ipAdd = InetAddress.getLocalHost().getHostAddress();
+			Text ipAddress = new Text("Server Address: "+ ipAdd);
+			ImageView startGame = new ImageView();
+			startGame.setImage(GameStage.NEW_GAME); //TODO: Baguhin yung image
+			startGame.setOnMouseClicked(new EventHandler<MouseEvent>() { 
+				@Override
+			     public void handle(MouseEvent event) {
+					stage.setScene(initServerGame(stage));
+			        event.consume();
+			     }
+			});
+			
+			// hover listener
+			startGame.hoverProperty().addListener((observable) -> {
+				if (startGame.isHover()) {
+					startGame.setImage(GameStage.NEW_GAME_HOVER);
+				} else {
+					startGame.setImage(GameStage.NEW_GAME);
+				}
+			});
+			VBox vbox = new VBox(25);
+			vbox.setAlignment(Pos.CENTER);
+			vbox.getChildren().addAll(userLabel,username, ipAddress,startGame);
+			vbox.setLayoutX(100);
+			vbox.setLayoutY(100);
+			root.getChildren().addAll(canvas,vbox);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		return new Scene(root);
+	}
+	
+	public Scene clientGameRoom(Stage stage) {
+		// Setting up the Server scene
+		Pane root = new Pane();
+						
+		// Background
+		Canvas canvas = new Canvas(GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT);
+		GraphicsContext gc = canvas.getGraphicsContext2D();
+		gc.drawImage(GameStage.BG, 0, 0);
+		//textbox for username
+		TextField username = new TextField();
+		Label userLabel = new Label("Username: ");
+		this.username = username.getText();
+		
+		//textbox for server add
+		TextField serverAdd = new TextField();
+		Label serverLabel = new Label("Server Address: ");
+		this.serverAdd = serverAdd.getText();
+		ImageView startGame = new ImageView();
+		startGame.setImage(GameStage.NEW_GAME); //TODO: Baguhin yung image
+		startGame.setOnMouseClicked(new EventHandler<MouseEvent>() { 
+			@Override
+		     public void handle(MouseEvent event) {
+				 stage.setScene(initClientGame(stage));
+		         event.consume();
+		     }
+		});
+		// hover listener
+		startGame.hoverProperty().addListener((observable) -> {
+			if (startGame.isHover()) {
+				startGame.setImage(GameStage.NEW_GAME_HOVER);
+			} else {
+				startGame.setImage(GameStage.NEW_GAME);
+				}
+		});
+		VBox vbox = new VBox(25);
+		vbox.setAlignment(Pos.CENTER);
+		vbox.getChildren().addAll(userLabel,username,serverLabel,serverAdd, startGame);
+		vbox.setLayoutX(100);
+		vbox.setLayoutY(100);
+		
+				
+		root.getChildren().addAll(canvas,vbox);
+		return new Scene(root);
+	}
+	
+
+	
+	public Scene initServerGame(Stage stage) {
 		// Setting up the game scene
 		StackPane root = new StackPane();
 		Canvas canvas = new Canvas(GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT);
@@ -242,30 +379,39 @@ public class GameStage {
 		this.gametimer = new GameTimer(gc, gameScene, this);
 		this.gametimer.start();
 		
+		
 		return gameScene;
 	}
-	
-	public void setGameOver() {
-		// Game over screen
+	public Scene initClientGame(Stage stage) {
+		// Setting up the game scene
 		StackPane root = new StackPane();
-		
-		// Setting the background
 		Canvas canvas = new Canvas(GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
-		gc.setFill(Color.BLACK);
-		gc.fillRect(0, 0, GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT);
+		root.getChildren().add(canvas);
+		Scene gameScene = new Scene(root);
 		
-		// Change scene content depending on the game results
-		ImageView result = new ImageView();
-		if (this.gametimer.isWin()) {
-			result.setImage(GameStage.WIN);
-		} else {
-			result.setImage(GameStage.LOSE);
-		}
+		// Starting the game
+		this.gametimer = new GameTimer(gc, gameScene, this);
+		this.gametimer.start();
 		
-		// Adding the node to the scene
-		root.getChildren().addAll(canvas, result);
-		this.stage.setScene(new Scene(root));
+				
+		return gameScene;		
+		
+	}
+	
+	
+	void setGameOver(int n){	//TODO: need chat and waiting room
+		this.gametimer.stop();
+		PauseTransition transition = new PauseTransition(Duration.seconds(0.2));
+		transition.play();
+
+		transition.setOnFinished(new EventHandler<ActionEvent>() {
+
+			public void handle(ActionEvent arg0) {
+				GameOverStage gameover = new GameOverStage(username);
+				gameover.setStage(n,stage,gametimer);
+			}
+		});
 	}
 	
 	public void setStage(Stage stage) {
@@ -282,4 +428,9 @@ public class GameStage {
 		this.stage.setResizable(false);
 		this.stage.show();
 	}
+	
+	
+
+
+	
 }
