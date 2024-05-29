@@ -22,7 +22,7 @@ import sprites.Fubuchan;
 /**
  * Client ata dapat to???
  */
-public class GameTimer extends AnimationTimer{
+public class GameTimer extends AnimationTimer implements Runnable{
 	private GraphicsContext gc;
 	private Scene scene;
 	private Fubuchan ship;
@@ -203,7 +203,7 @@ public class GameTimer extends AnimationTimer{
 		if (this.inGameTime > 60 ) {
 			this.stop();
 			this.win = true;
-			this.gs.setGameOver(1);
+			this.gs.setGameOver(1, name);
 		}
 		
 		// checking collisions
@@ -294,11 +294,11 @@ public class GameTimer extends AnimationTimer{
 	private void drawScoreboard() {
 		this.gc.setFont(Font.font("Calibri", 30));
 		this.gc.fillText("Strength: ", 10, 30);
-		this.gc.fillText(Integer.toString(this.ship.getStrength()), 140, 30);
+		// this.gc.fillText(Integer.toString(this.ship.getStrength()), 140, 30);
 		this.gc.fillText("Time: ", GameStage.WINDOW_WIDTH / 2 - 60, 30);
 		this.gc.fillText(Integer.toString(this.inGameTime), GameStage.WINDOW_WIDTH / 2 + 30, 30);
 		this.gc.fillText("Score: ", GameStage.WINDOW_WIDTH - 140, 30);
-		this.gc.fillText(Integer.toString(this.ship.getScore()), GameStage.WINDOW_WIDTH - 40, 30);
+		// this.gc.fillText(Integer.toString(this.ship.getScore()), GameStage.WINDOW_WIDTH - 40, 30);
 	}
 
 	
@@ -353,6 +353,21 @@ public class GameTimer extends AnimationTimer{
                 }
 
             }
+		
+			private void updatePlayerPosition(String pname, int x, int y) {
+				// Find the player with pname in the list of players
+				for (Player player : players) {
+					if (player.getName().equals(pname)) {
+						// Update the player's position
+						player.setX(x);
+						player.setY(y);
+						return;
+					}
+				}
+				// If player not found, create a new player object and add it to the list
+				Player newPlayer = new Player(pname);
+				players.add(newPlayer);
+			}
         }
     }
 	
