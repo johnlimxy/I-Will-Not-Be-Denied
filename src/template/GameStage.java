@@ -418,7 +418,7 @@ public class GameStage {
 			public void handle(ActionEvent arg0) {
 				GameOverStage gameover;
 				try {
-					gameover = new GameOverStage();
+					gameover = new GameOverStage(username);
 					gameover.setStage(n,stage,gametimer);
 				} catch (SocketException e) {
 					// TODO Auto-generated catch block

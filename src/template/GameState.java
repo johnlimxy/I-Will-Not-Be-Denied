@@ -20,9 +20,9 @@ public class GameState {
 	 * @param name
 	 * @param player
 	 */
-	// public void update(String name, NetPlayer player){
-	// 	players.put(name,player);
-	// }
+	public void update(String name, NetPlayer player){
+		players.put(name,player);
+	}
 	
 	/**
 	 * String representation of this object. Used for data transfer
