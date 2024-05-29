@@ -32,7 +32,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
-
 public class GameStage {
 	// Class Attributes
 	public final static Image BG = new Image("assets/test.png");
@@ -398,8 +397,8 @@ public class GameStage {
 		Scene gameScene = new Scene(root);
 		
 		// Starting the game
-		this.waitinglobby = new WaitingLobby(stage,server,name);
-		this.waitinglobby.run();
+		this.gametimer = new GameTimer(gc, gameScene, this, server,name);
+		this.gametimer.start();
 		
 		
 		return gameScene;
@@ -407,7 +406,7 @@ public class GameStage {
 
 	
 	
-	void setGameOver(int n){	//TODO: need chat and waiting room
+	void setGameOver(int n, String username){	//TODO: need chat and waiting room
 		this.gametimer.stop();
 		PauseTransition transition = new PauseTransition(Duration.seconds(0.2));
 		transition.play();
@@ -432,7 +431,7 @@ public class GameStage {
 	public void setStage(Stage stage) {
 		// Setting up the welcome screen
 		this.stage = stage;
-		this.stage.setTitle("I Will (Not) Be Denied");
+		this.stage.setTitle("Fubuki's Shiny Magikarp");
 		
 		// Setting up the main menu
 		this.selectSplash(this.stage);
