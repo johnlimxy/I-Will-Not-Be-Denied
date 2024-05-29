@@ -18,6 +18,7 @@ import javafx.scene.text.Font;
 import sprites.Bullet;
 import sprites.Crosshair;
 import sprites.Fubuchan;
+import java.util.List;
 
 /**
  * Client ata dapat to???
@@ -25,7 +26,8 @@ import sprites.Fubuchan;
 public class GameTimer extends AnimationTimer implements Runnable{
 	private GraphicsContext gc;
 	private Scene scene;
-	private Fubuchan ship;
+	private List<Fubuchan> players;
+	private Fubuchan player;
 	private Crosshair crosshair;
 	private GameStage gs;
 	private long gameStart;
@@ -109,79 +111,79 @@ public class GameTimer extends AnimationTimer implements Runnable{
 	
 	// Process input method
 	private void processInput() {
-		// Moving ship and bullets
-		// Fubuchan ship = this.ship;
+		Moving ship and bullets
+		Fubuchan ship = this.ship;
 		Crosshair crosshair = this.crosshair;
-		// this.scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-		// 	public void handle(KeyEvent e) {
-		// 		KeyCode code = e.getCode();
-		// 		prevX=ship.getX();prevY=ship.getY();
-				
-		// 		// Possible movements
-		// 		if (code == KeyCode.W) {
-		// 			ship.setdY(-Fubuchan.SHIP_SPEED);
-		// 			ship.setOrientation('W');
-		// 		}
-				
-		// 		if (code == KeyCode.S) {
-		// 			ship.setdY(Fubuchan.SHIP_SPEED);
-		// 			ship.setOrientation('E');
-		// 		}
-				
-		// 		if (code == KeyCode.A) { 
-		// 			ship.setdX(-Fubuchan.SHIP_SPEED);
-		// 			ship.setOrientation('W');
-		// 		}
-				
-		// 		if (code == KeyCode.D) {
-		// 			ship.setdX(Fubuchan.SHIP_SPEED);
-		// 			ship.setOrientation('E');
-		// 		}
-		// 		// Logging movements
-		// 		System.out.println(code + " key pressed.");
-				
-		// 		if (prevX != x || prevY != y){
-		// 			send("PLAYER "+name+" "+x+" "+y);
-		// 		}
-				
-
-		// 	}
-		// });
-		
-		// this.scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
-		// 	public void handle(KeyEvent e) {
-		// 		// Stopping movements
-		// 		ship.setdX(0);
-		// 		ship.setdY(0);
-		// 		ship.setOrientation(' ');
-		// 	}
-		// });
-		
-		// this.scene.setOnMouseMoved(new EventHandler<MouseEvent>() {
-		// 	public void handle(MouseEvent e) {
-		// 		crosshair.setdXdY(e.getX(), e.getY());
+		this.scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent e) {
+				KeyCode code = e.getCode();
+				prevX=ship.getX();prevY=ship.getY();
 			
-		// 		System.out.println("MOUSE X : " + e.getX() + " MOUSE Y : " + e.getY());
-		// 		if (prevXM != e.getX() || prevYM != e.getY()){
-		// 			send("PLAYER MOUSE"+name+" "+e.getX()+" "+e.getX());
-		// 		}
-		// 	}
-		// });
+				// Possible movements
+				if (code == KeyCode.W) {
+					ship.setdY(-Fubuchan.SHIP_SPEED);
+					ship.setOrientation('W');
+				}
+			
+				if (code == KeyCode.S) {
+					ship.setdY(Fubuchan.SHIP_SPEED);
+					ship.setOrientation('E');
+				}
+			
+				if (code == KeyCode.A) { 
+					ship.setdX(-Fubuchan.SHIP_SPEED);
+					ship.setOrientation('W');
+				}
+			
+				if (code == KeyCode.D) {
+					ship.setdX(Fubuchan.SHIP_SPEED);
+					ship.setOrientation('E');
+				}
+				// Logging movements
+				System.out.println(code + " key pressed.");
+			
+				if (prevX != x || prevY != y){
+					send("PLAYER "+name+" "+x+" "+y);
+				}
+			
+
+			}
+		});
+	
+		this.scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent e) {
+				// Stopping movements
+				ship.setdX(0);
+				ship.setdY(0);
+				ship.setOrientation(' ');
+			}
+		});
 		
-		// this.scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
-		// 	public void handle(MouseEvent e) {
-		// 		crosshair.setdXdY(e.getX(), e.getY());
-		// 		ship.shoot(e.getX(), e.getY());
-		// 	}
-		// });
+		this.scene.setOnMouseMoved(new EventHandler<MouseEvent>() {
+			public void handle(MouseEvent e) {
+				crosshair.setdXdY(e.getX(), e.getY());
+		
+				System.out.println("MOUSE X : " + e.getX() + " MOUSE Y : " + e.getY());
+				if (prevXM != e.getX() || prevYM != e.getY()){
+					send("PLAYER MOUSE"+name+" "+e.getX()+" "+e.getX());
+				}
+			}
+		});
+		
+		this.scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			public void handle(MouseEvent e) {
+				crosshair.setdXdY(e.getX(), e.getY());
+				ship.shoot(e.getX(), e.getY());
+			}
+		});
 		
 		// flame thrower 
-		//this.scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
-		//	public void handle(MouseEvent e) {
-		//		crosshair.setdXdY(e.getX(), e.getY());
-		//		ship.shoot(e.getX(), e.getY());
-		//	}
-		//});
+		this.scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
+			public void handle(MouseEvent e) {
+				crosshair.setdXdY(e.getX(), e.getY());
+				ship.shoot(e.getX(), e.getY());
+			}
+		});
 	}
 	
 	// Update method
@@ -335,7 +337,7 @@ public class GameTimer extends AnimationTimer implements Runnable{
                 System.out.println("Connecting..");
                 send("CONNECT " + name);
             } else if (connected) {
-
+				System.out.println("CONNECTED NA PAADSFLKJ");
                 if (serverData.startsWith("PLAYER")) {
                     String[] playersInfo = serverData.split(":");
                     for (int i = 0; i < playersInfo.length; i++) {
@@ -353,23 +355,23 @@ public class GameTimer extends AnimationTimer implements Runnable{
                 }
 
             }
+		}
+	}
 		
-			private void updatePlayerPosition(String pname, int x, int y) {
-				// Find the player with pname in the list of players
-				for (Player player : players) {
-					if (player.getName().equals(pname)) {
-						// Update the player's position
-						player.setX(x);
-						player.setY(y);
-						return;
-					}
-				}
-				// If player not found, create a new player object and add it to the list
-				Player newPlayer = new Player(pname);
-				players.add(newPlayer);
+	private void updatePlayerPosition(String pname, int x, int y) {
+		// Find the player with pname in the list of players
+		for (Fubuchan player : players) {
+			if (player.getName().equals(pname)) {
+				// Update the player's position
+				player.setX(x);
+				player.setY(y);
 			}
-        }
-    }
+		}
+		// If player not found, create a new player object and add it to the list
+		Fubuchan newPlayer = new Fubuchan(position);
+		players.add(newPlayer);
+	}
+}
 	
 
 	
