@@ -16,48 +16,51 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 	
 	private int strength; //Instance attributes
 	private boolean alive; 
-	private ArrayList<Bullet> bullets;
+	// private ArrayList<Bullet> bullets;
 	private int ammo;
 	private int score;
 	private boolean invincible;
+	private boolean isReloading;
 	private int port;
 	private InetAddress address;
 	private String username;
+	private double mouseX, mouseY;
 	
 	private char orientation;
 	
 	public Fubuchan(double positionX, double positionY, String username,InetAddress address, int port) {	//Constructor
 		super(positionX, positionY);
-		Random r = new Random();
-		this.strength = r.nextInt(51) + 100;
-		this.alive = true;
-		this.loadImage(Fubuchan.IDLE_SHIP);
-		this.bullets = new ArrayList<Bullet>();
-		this.score = 0;
-		this.invincible = false;
-		this.orientation = 'E';
-		this.ammo = 10;
+		// Random r = new Random();
+		// this.strength = r.nextInt(51) + 100;
+		// this.alive = true;
+		// // this.loadImage(Fubuchan.IDLE_SHIP);
+		// this.bullets = new ArrayList<Bullet>();
+		// this.score = 0;
+		// this.invincible = false;
+		// this.orientation = 'E';
+		// this.ammo = 10;
 		this.address = address;
 		this.port = port;
 		this.username = username;
 	}
 	
-	public void move() {
-		// Restricting movement outside of the screen
-		if(this.positionX+ this.dX < GameStage.WINDOW_WIDTH && this.positionX + this.dX > 0 && this.positionY +this.dY <GameStage.WINDOW_HEIGHT && this.positionY + this.dY > 0 ){
-			this.positionX += this.dX;
-			this.positionY += this.dY;
-		}
-	}
+	// public void move() {
+	// 	// Restricting movement outside of the screen
+	// 	if(this.positionX+ this.dX < GameStage.WINDOW_WIDTH && this.positionX + this.dX > 0 && this.positionY +this.dY <GameStage.WINDOW_HEIGHT && this.positionY + this.dY > 0 ){
+	// 		this.positionX += this.dX;
+	// 		this.positionY += this.dY;
+	// 	}
+	// }
 	
 	public void stop() {
 		this.dX = 0;
 		this.dY = 0;
 	}
 	
-	public void reload() {
-		this.ammo = 10;
+	public void setReloading(boolean reloading) {
+		isReloading = reloading;
 	}
+
 	
 	
 	public void shoot(double mouseX, double mouseY) {
@@ -82,6 +85,7 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 		}
 	}
 	
+	
 	private void checkStrength() {
 		if (this.strength <= 0) {
 			this.alive = false;
@@ -93,10 +97,10 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 		return this.bullets;
 	}
 	
-	public boolean isAlive() {
-		this.checkStrength();
-		return this.alive;
-	}
+	// public boolean isAlive() {
+	// 	this.checkStrength();
+	// 	return this.alive;
+	// }
 	
 	public int getStrength() {
 		return this.strength;
@@ -125,10 +129,50 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 	public int getScore(int score){
 		return this.score;
 	}
+
+	public int getAmmo(){
+		return this.ammo;
+	}
+
+	public boolean isReloading(){
+		return this.isReloading;
+	}
+
+	/**
+	 * Returns the port number
+	 * @return
+	 */
+	public int getPort(){
+		return port;
+	}
+	
+	/**
+	 * Returns the name of the player
+	 * @return
+	 */
+	public String getName(){
+		return username;
+	}
 	
 	//Setters
 	void setStrength(int strength) {
 		this.strength = strength;
+	}
+
+	public void setAmmo() {
+		this.ammo = 10;
+	}
+
+	public void setMouseX(double mouseX){
+		this.mouseX = mouseX;
+	}
+
+	public void setMouseY(double mouseY){
+		this.mouseY = mouseY;
+	}
+
+	public void setAlive(boolean alive) {
+		this.alive = alive;
 	}
 	
 	void setScore(int score) {
@@ -140,19 +184,21 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 	}
 	
 	public void setOrientation(char orientation) {
-		if (orientation == 'W') {
-			this.loadImage(Fubuchan.REV_SHIP);
-			this.orientation = 'W';
-		} else if (orientation == 'E'){
-			this.loadImage(Fubuchan.SHIP);
-			this.orientation = 'E';
-		} else {
-			if (this.orientation == 'W') {
-				this.loadImage(Fubuchan.IDLE_REV_SHIP);
-			}else {
-				this.loadImage(Fubuchan.IDLE_SHIP);
-			}
-		}
+		// if (orientation == 'W') {
+		// 	this.loadImage(Fubuchan.REV_SHIP);
+		// 	this.orientation = 'W';
+		// } else if (orientation == 'E'){
+		// 	this.loadImage(Fubuchan.SHIP);
+		// 	this.orientation = 'E';
+		// } else {
+		// 	if (this.orientation == 'W') {
+		// 		this.loadImage(Fubuchan.IDLE_REV_SHIP);
+		// 	}else {
+		// 		this.loadImage(Fubuchan.IDLE_SHIP);
+		// 	}
+		// }
+
+		this.orientation = orientation;
 	}
 
 	/**
@@ -163,12 +209,22 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 		return address;
 	}
 
+	public boolean isAlive(){
+		return this.alive;
+	}
+
 	public String toString(){
 		String retval="";
 		retval+="PLAYER ";
 		retval+=username+" ";
 		retval+=x+" ";
-		retval+=y;
+		retval+=y+" ";
+		retval
+		retval+=orientation+" ";
+		retval+=ammo+" ";
+		retval+=strength+" ";
+		retval+=alive+" ";
+
 		return retval;
 	}
 	/**
@@ -183,5 +239,6 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 	}
 }
 
+	
 	
 	
