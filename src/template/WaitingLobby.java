@@ -65,7 +65,7 @@ public class WaitingLobby implements Runnable{
 	    scene = new Scene(root,GameStage.WINDOW_WIDTH,GameStage.WINDOW_HEIGHT);
 	    stage.setScene(scene);
 	    stage.show();
-	    t.start();
+	    t.start(); //start thread
 	    
 	
 	}
@@ -76,10 +76,11 @@ public class WaitingLobby implements Runnable{
 	    container.setContent(chatBox); 
 	
 	    chatBox.getStyleClass().add("chatbox");
-	    msgBox.setLayoutX(100);
-		msgBox.setLayoutY(100);
-		msgBox.prefHeight(50);
+	    msgBox.prefHeight(50);
 		msgBox.prefWidth(100);
+	    msgBox.setLayoutX(0);
+		msgBox.setLayoutY(410);
+		
 		String message = msgBox.getText();
 	
 	    add.setOnAction(evt->{

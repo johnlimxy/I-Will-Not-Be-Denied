@@ -289,20 +289,20 @@ public class GameStage {
 			//textbox for username
 			TextField username = new TextField();
 			Label userLabel = new Label("Username: ");
-			String name = username.getText();
+			
 			//display for server ip add
 			String ipAdd = InetAddress.getLocalHost().getHostAddress();
 			Text ipAddress = new Text("Server Address: "+ ipAdd);
 			ImageView startGame = new ImageView();
 			startGame.setImage(GameStage.NEW_GAME); //TODO: Baguhin yung image
-			System.out.print("Trying to connect "+ipAdd+ name+"\n");
+			
 			startGame.setOnMouseClicked(new EventHandler<MouseEvent>() { 
 				@Override
 			     public void handle(MouseEvent event) {
 					new GameServer(2); //initialize server
+					String name = username.getText();
 					try {
-						
-						stage.setScene(initServerGame(stage, ipAdd, "Asha"));
+						stage.setScene(initGame(stage, ipAdd, name));
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -343,21 +343,21 @@ public class GameStage {
 		//textbox for username
 		TextField username = new TextField();
 		Label userLabel = new Label("Username: ");
-		String uname = username.getText();
 		
 		//textbox for server add
 		TextField serverAdd = new TextField();
 		Label serverLabel = new Label("Server Address: ");
-		String serverA = serverAdd.getText();
+		
 		ImageView startGame = new ImageView();
-		System.out.print("Trying to connect" + uname);
+		
 		startGame.setImage(GameStage.NEW_GAME); //TODO: Baguhin yung image
 		startGame.setOnMouseClicked(new EventHandler<MouseEvent>() { 
 			@Override
 		     public void handle(MouseEvent event) {
+				String name = username.getText();
+				String server = serverAdd.getText();
 				 try {
-					System.out.print("Trying to connect" + uname);
-					stage.setScene(initServerGame(stage, "192.168.56.1", "Mae" ));
+					stage.setScene(initGame(stage, server, name ));
 					
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -387,7 +387,7 @@ public class GameStage {
 	
 
 	
-	public Scene initServerGame(Stage stage, String server,String name) throws Exception {
+	public Scene initGame(Stage stage, String server,String name) throws Exception {
 		// Setting up the game scene
 		StackPane root = new StackPane();
 		Canvas canvas = new Canvas(GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT);
@@ -402,22 +402,7 @@ public class GameStage {
 		
 		return gameScene;
 	}
-	public Scene initClientGame(Stage stage, String server,String name) throws Exception {
-		// Setting up the game scene
-		StackPane root = new StackPane();
-		Canvas canvas = new Canvas(GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT);
-		GraphicsContext gc = canvas.getGraphicsContext2D();
-		root.getChildren().add(canvas);
-		Scene gameScene = new Scene(root);
-		
-		// Starting the game
-		this.gametimer = new GameTimer(gc, gameScene, this, server, name);
-		this.gametimer.start();
-		
-				
-		return gameScene;		
-		
-	}
+
 	
 	
 	void setGameOver(int n){	//TODO: need chat and waiting room
