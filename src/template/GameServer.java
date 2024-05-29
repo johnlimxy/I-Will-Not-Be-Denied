@@ -3,7 +3,11 @@ package template;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+
+import javafx.stage.Stage;
 
 /**
  * The main game server. It just accepts the messages sent by one player to
@@ -42,6 +46,9 @@ public class GameServer implements Runnable{
 	 * Number of players
 	 */
 	int numPlayers;
+	String server;
+	String name;
+	Stage stage;
 	
 	/**
 	 * The main game thread
@@ -53,6 +60,9 @@ public class GameServer implements Runnable{
 	 */
 	public GameServer(int numPlayers){
 		this.numPlayers = numPlayers;
+		this.stage = stage;
+		this.server = server;
+		this.name = name;
 		try {
             serverSocket = new DatagramSocket(GameStage.DEFAULT_PORT_NUMBER);
 			serverSocket.setSoTimeout(100);
@@ -130,11 +140,12 @@ public class GameServer implements Runnable{
 							String tokens[] = playerData.split(" ");
 							NetPlayer player=new NetPlayer(tokens[1],packet.getAddress(),packet.getPort());
 							System.out.println("Player connected: "+tokens[1]);
-							//game.update(tokens[1].trim(),player);
+							game.update(tokens[1].trim(),player);
 							broadcast("CONNECTED "+tokens[1]);
 							playerCount++;
 							if (playerCount==numPlayers){
 								gameStage=GameStage.GAME_START;
+								allPlayersHere();
 							}
 						}
 					  break;	
@@ -159,21 +170,28 @@ public class GameServer implements Runnable{
 						  player.setX(x);
 						  player.setY(y);
 						  //Update the game state
-						  //game.update(pname, player);
+						  game.update(pname, player);
 						  //Send to all the updated game state
 						  broadcast(game.toString());
-					  }else if (playerData.startsWith("MESSAGE")){
-						  String[] playerInfo = playerData.split(",,");
-						  String pname = playerInfo[1];
-						  broadcast(game.toString());
-						  
-						  
 					  }
+					  
+					  if (playerData.startsWith("MESSAGE")) {
+	                        // Tokenize chat message
+	                        String[] tokens = playerData.split(" ", 2);
+	                        String message = tokens[1];
+	                        // Broadcast chat message to all players
+	                        broadcast("MESSAGE " + message);
+	                        System.out.print("To client MESSAGE " + message+"\n");
+	                    }
 					  break;
 			}				  
 		}
 	}	
 	
+	public boolean allPlayersHere() {
+		return true;
+		
+	}
 	
 	public static void main(String args[]){
 		if (args.length != 1){
