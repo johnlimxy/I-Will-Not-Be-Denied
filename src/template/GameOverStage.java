@@ -28,6 +28,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -43,12 +44,12 @@ public class GameOverStage implements Runnable{
 	private Button exitbtn = new Button("Exit Game");
 	private Button menubtn = new Button("Main Menu");
 	
-	private final Button add = new Button("Add");
-	private final VBox chatBox = new VBox(5);
-	private final TextField msgBox = new TextField();
-	private List<Label> messages = new ArrayList<>();
-	private ScrollPane container = new ScrollPane();
-	private int index = 0;
+	private final Button add;
+	private final VBox chatBox;
+	private final TextField msgBox;
+	private TextArea messages;
+	private ScrollPane container;
+	private int index;
 	
 	Thread t = new Thread(this);
 	/**
@@ -73,12 +74,19 @@ public class GameOverStage implements Runnable{
 	String name;
 
 
-	GameOverStage() throws SocketException{
-		
+	GameOverStage(String name) throws SocketException{
+		this.name = name;
 		this.pane = new StackPane();
 		this.scene = new Scene(pane, GameStage.WINDOW_WIDTH,GameStage.WINDOW_HEIGHT);
 		this.canvas = new Canvas(GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT);
 		this.gc = canvas.getGraphicsContext2D();
+		
+		this.add = new Button("Add");
+		this.chatBox = new VBox(5);
+		this.msgBox = new TextField();
+		this.messages = new TextArea();
+		this.container  = new ScrollPane();
+		this.index = 0;
 		socket.setSoTimeout(100);
 		t.start();
 
@@ -103,20 +111,16 @@ public class GameOverStage implements Runnable{
 				msgBox.setLayoutY(GameStage.WINDOW_HEIGHT-50);
 				add.setLayoutX(GameStage.WINDOW_WIDTH-50);
 				add.setLayoutY(GameStage.WINDOW_HEIGHT-50);
-
 			    add.setOnAction(evt->{
-
-			        messages.add(new Label(msgBox.getText()));
-
-			        messages.get(index).setAlignment(Pos.CENTER_LEFT);
-
-			        chatBox.getChildren().add(messages.get(index));
-			        index++;
-
+			    	String temp = messages.getText();
+			        
+			        sendChatMessage(msgBox.getText());
+			        
+			        msgBox.clear();
 			    });
 
 
-			    pane.getChildren().addAll(container,chatBox,msgBox,add);
+			    pane.getChildren().addAll(container,chatBox,messages,msgBox,add);
 
 		//display win or lose, 1=win
 		if (n==1){
@@ -186,6 +190,7 @@ public class GameOverStage implements Runnable{
 	
 	public void sendChatMessage(String message) {
         send("MESSAGE " + name + ": " + message);
+        System.out.print("To server MESSAGE " + name + ": " + message+"\n");
     }
 	
 	public void run() {
@@ -216,20 +221,21 @@ public class GameOverStage implements Runnable{
             } else if (!connected) {
                 System.out.println("Connecting..");
                 send("CONNECT " + name);
-            } 
-                else if (connected) {
-                if (serverData.startsWith("CHAT")) {
+            } else if (connected) {
+                if (serverData.startsWith("MESSAGE")) {
                     // Tokenize chat message
                     String[] tokens = serverData.split(" ", 2);
                     String message = tokens[1];
                     // Display chat message in chat panel
-//                    chatPanel.addMessage(message);
-
-//                    repaint();
+                    System.out.print("from server MESSAGE " + message + "\n");
+                    
+                    String temp = messages.getText();
+			        messages.setText(temp+message+"\n");
                 }
             }
         }
     }
+	
 	
 
 }
