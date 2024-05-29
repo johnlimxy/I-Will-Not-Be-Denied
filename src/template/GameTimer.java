@@ -225,12 +225,9 @@ public class GameTimer extends AnimationTimer implements Runnable{
 		
 		// rendering scoreboard
 		this.drawScoreboard();
-		for (Iterator<Fubuchan> i = this.players.iterator(); i.hasNext(); ) {
-			Fubuchan f = i.next();
-			f.render(this.gc);
-		}
-//		 rendering the units
 		
+//		 rendering the units
+		 this.player.render(this.gc);
 		
 		// render crosshair
 		this.crosshair.render(this.gc);
