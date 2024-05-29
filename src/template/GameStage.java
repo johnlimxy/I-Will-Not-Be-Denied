@@ -398,8 +398,8 @@ public class GameStage {
 		Scene gameScene = new Scene(root);
 		
 		// Starting the game
-		this.gametimer = new GameTimer(stage,server,name);
-		this.gametimer.start();
+		this.waitinglobby = new WaitingLobby(stage,server,name);
+		this.waitinglobby.run();
 		
 		
 		return gameScene;
@@ -432,7 +432,7 @@ public class GameStage {
 	public void setStage(Stage stage) {
 		// Setting up the welcome screen
 		this.stage = stage;
-		this.stage.setTitle("Fubuki's Shiny Magikarp");
+		this.stage.setTitle("I Will (Not) Be Denied");
 		
 		// Setting up the main menu
 		this.selectSplash(this.stage);
