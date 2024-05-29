@@ -70,6 +70,7 @@ public class GameStage {
 	private WaitingLobby waitinglobby;
 	private GraphicsContext gc;
 	private Scene scene;
+	private String username;
 	
 	// Constructor
 	public GameStage() {
@@ -289,7 +290,7 @@ public class GameStage {
 			//textbox for username
 			TextField username = new TextField();
 			Label userLabel = new Label("Username: ");
-			
+			this.username = username.getText();
 			//display for server ip add
 			String ipAdd = InetAddress.getLocalHost().getHostAddress();
 			Text ipAddress = new Text("Server Address: "+ ipAdd);
@@ -302,7 +303,7 @@ public class GameStage {
 					new GameServer(2); //initialize server
 					String name = username.getText();
 					try {
-						stage.setScene(initGame(stage, ipAdd, name));
+						stage.setScene(initGame(stage, "localhost", name));
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -343,7 +344,7 @@ public class GameStage {
 		//textbox for username
 		TextField username = new TextField();
 		Label userLabel = new Label("Username: ");
-		
+		this.username = username.getText();
 		//textbox for server add
 		TextField serverAdd = new TextField();
 		Label serverLabel = new Label("Server Address: ");
@@ -396,8 +397,8 @@ public class GameStage {
 		Scene gameScene = new Scene(root);
 		
 		// Starting the game
-		this.waitinglobby = new WaitingLobby(stage,server,name);
-		this.waitinglobby.run();
+		this.gametimer = new GameTimer(gc, gameScene, this, server,name);
+		this.gametimer.start();
 		
 		
 		return gameScene;
@@ -409,12 +410,20 @@ public class GameStage {
 		this.gametimer.stop();
 		PauseTransition transition = new PauseTransition(Duration.seconds(0.2));
 		transition.play();
+		
 
 		transition.setOnFinished(new EventHandler<ActionEvent>() {
 
 			public void handle(ActionEvent arg0) {
-				GameOverStage gameover = new GameOverStage();
-				gameover.setStage(n,stage,gametimer);
+				GameOverStage gameover;
+				try {
+					gameover = new GameOverStage();
+					gameover.setStage(n,stage,gametimer);
+				} catch (SocketException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			}
 		});
 	}

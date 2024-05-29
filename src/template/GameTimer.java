@@ -55,6 +55,7 @@ public class GameTimer extends AnimationTimer{
 	 * get a datagram socket
 	 */
     DatagramSocket socket = new DatagramSocket();
+//    Thread t = new Thread(this);
     /**
      * Placeholder for data received from server
      */
@@ -75,15 +76,13 @@ public class GameTimer extends AnimationTimer{
 		this.name = name;
 		//set some timeout for the socket
 		socket.setSoTimeout(100);
-		
-		Thread t=new Thread(this); //idk yet
-		
-		
-				
+	
 		//Initialization
 		this.init();
 		//Process Input
 		this.processInput();
+		
+//		t.start();
 	}
 	
 	//net methods
@@ -426,6 +425,61 @@ public class GameTimer extends AnimationTimer{
 	public boolean isWin() {
 		return this.win;
 	}
+
+	public void run() {
+        while (true) {
+            try {
+                Thread.sleep(1);
+            } catch (Exception ioe) {
+            }
+
+            //Get the data from players
+            byte[] buf = new byte[256];
+            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            try {
+                socket.receive(packet);
+            } catch (Exception ioe) {/*lazy exception handling :)*/
+            }
+
+            serverData = new String(buf);
+            serverData = serverData.trim();
+
+            //if (!serverData.equals("")){
+            //	System.out.println("Server Data:" +serverData);
+            //}
+            //Study the following kids. 
+            if (!connected && serverData.startsWith("CONNECTED")) {
+                connected = true;
+                System.out.println("Connected.");
+            } else if (!connected) {
+                System.out.println("Connecting..");
+                send("CONNECT " + name);
+            } else if (connected) {
+
+                if (serverData.startsWith("PLAYER")) {
+                    String[] playersInfo = serverData.split(":");
+                    for (int i = 0; i < playersInfo.length; i++) {
+                        String[] playerInfo = playersInfo[i].split(" ");
+                        String pname = playerInfo[1];
+                        int x = Integer.parseInt(playerInfo[2]);
+                        int y = Integer.parseInt(playerInfo[3]);
+                        // player.setX(x);
+                        // player.setY(y);
+//                        updatePlayerPosition(pname, x, y);
+
+                    }
+                    //show the changes
+//                    repaint();
+                }
+
+            }
+        }
+    }
+	
+
+	
+	
+
 
 
 }

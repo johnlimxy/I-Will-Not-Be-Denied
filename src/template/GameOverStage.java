@@ -15,6 +15,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,11 +28,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class GameOverStage {
+public class GameOverStage implements Runnable{
 	private StackPane pane;
 	private Scene scene;
 	private Stage stage;
@@ -37,24 +42,45 @@ public class GameOverStage {
 	private GameTimer gametimer;
 	private Button exitbtn = new Button("Exit Game");
 	private Button menubtn = new Button("Main Menu");
-	private String username;
 	
 	private final Button add = new Button("Add");
 	private final VBox chatBox = new VBox(5);
+	private final TextField msgBox = new TextField();
 	private List<Label> messages = new ArrayList<>();
 	private ScrollPane container = new ScrollPane();
 	private int index = 0;
 	
+	Thread t = new Thread(this);
+	/**
+	 * Flag to indicate whether this player has connected or not
+	 */
+	boolean connected=false;
+
+	/**
+	 * get a datagram socket
+	 */
+    DatagramSocket socket = new DatagramSocket();
 	
+	/**
+	 * Player name of others
+	 */
+	String pname;
+	/**
+	 * Placeholder for data received from server
+	 */
+	String serverData;
+	String server;
+	String name;
 
 
-	GameOverStage(){
+	GameOverStage() throws SocketException{
 		
-		this.username = username;
 		this.pane = new StackPane();
 		this.scene = new Scene(pane, GameStage.WINDOW_WIDTH,GameStage.WINDOW_HEIGHT);
 		this.canvas = new Canvas(GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT);
 		this.gc = canvas.getGraphicsContext2D();
+		socket.setSoTimeout(100);
+		t.start();
 
 	}
 
@@ -62,7 +88,35 @@ public class GameOverStage {
 		this.gc.drawImage(GameStage.BG, 0, 0);
 		this.gc.setFill(Color.BLACK);
 		this.gametimer = gametimer;
-		pane.getChildren().add(this.canvas);
+		pane.getChildren().addAll(this.canvas);
+		//add chatbox
+				container.setPrefSize(100, GameStage.WINDOW_HEIGHT);
+			    container.setContent(chatBox); 
+			    container.setLayoutX(GameStage.WINDOW_WIDTH-100);
+				container.setLayoutY(0);
+				chatBox.setPrefSize(100,GameStage.WINDOW_HEIGHT);
+			    chatBox.setLayoutX(GameStage.WINDOW_HEIGHT-100);
+				chatBox.setLayoutY(0);
+			    msgBox.prefHeight(50);
+				msgBox.prefWidth(200);
+				msgBox.setLayoutX(GameStage.WINDOW_WIDTH-250);
+				msgBox.setLayoutY(GameStage.WINDOW_HEIGHT-50);
+				add.setLayoutX(GameStage.WINDOW_WIDTH-50);
+				add.setLayoutY(GameStage.WINDOW_HEIGHT-50);
+
+			    add.setOnAction(evt->{
+
+			        messages.add(new Label(msgBox.getText()));
+
+			        messages.get(index).setAlignment(Pos.CENTER_LEFT);
+
+			        chatBox.getChildren().add(messages.get(index));
+			        index++;
+
+			    });
+
+
+			    pane.getChildren().addAll(container,chatBox,msgBox,add);
 
 		//display win or lose, 1=win
 		if (n==1){
@@ -87,7 +141,7 @@ public class GameOverStage {
 		exitbtn.setTranslateY(135);
 		this.addEventHandler(exitbtn);
 		
-		//add chatbox
+		
 
 		//set stage elements here
 		
@@ -119,30 +173,63 @@ public class GameOverStage {
 		}
 	}
 	
-
 	
-	private void initChatBox(){
-
-	    container.setPrefSize(216, 400);
-	    container.setContent(chatBox);
-		chatBox.minHeight(400);
-		chatBox.minHeight(200);
-
-	    chatBox.getStyleClass().add("chatbox");
-
-	    add.setOnAction(evt->{
-
-	        messages.add(new Label("I'm a message"));
-
-	        messages.get(index).setAlignment(Pos.CENTER_LEFT);
-
-	        chatBox.getChildren().add(messages.get(index));
-	        index++;
-
-	    });
-
-
-	    pane.getChildren().addAll(container,add);
+	public void send(String msg){
+		try{
+			byte[] buf = msg.getBytes();
+        	InetAddress address = InetAddress.getByName(server);
+        	DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 1234);
+        	socket.send(packet);
+        }catch(Exception e){}
+		
 	}
+	
+	public void sendChatMessage(String message) {
+        send("MESSAGE " + name + ": " + message);
+    }
+	
+	public void run() {
+        while (true) {
+            try {
+                Thread.sleep(1);
+            } catch (Exception ioe) {
+            }
+
+            //Get the data from players
+            byte[] buf = new byte[256];
+            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            try {
+                socket.receive(packet);
+            } catch (Exception ioe) {/*lazy exception handling :)*/
+            }
+
+            serverData = new String(buf);
+            serverData = serverData.trim();
+
+            //if (!serverData.equals("")){
+            //	System.out.println("Server Data:" +serverData);
+            //}
+            //Study the following kids. 
+            if (!connected && serverData.startsWith("CONNECTED")) {
+                connected = true;
+                System.out.println("Connected.");
+            } else if (!connected) {
+                System.out.println("Connecting..");
+                send("CONNECT " + name);
+            } 
+                else if (connected) {
+                if (serverData.startsWith("CHAT")) {
+                    // Tokenize chat message
+                    String[] tokens = serverData.split(" ", 2);
+                    String message = tokens[1];
+                    // Display chat message in chat panel
+//                    chatPanel.addMessage(message);
+
+//                    repaint();
+                }
+            }
+        }
+    }
+	
 
 }

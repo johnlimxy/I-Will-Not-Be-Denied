@@ -85,14 +85,5 @@ public class NetPlayer {
 		retval+=y;
 		return retval;
 	}
-	/**
-	 * String representation. used for transfer over the network
-	 */
-	public String messageToString(){
-		String retval="";
-		retval+="MESSAGE ";
-		retval+=username+" ";
-		retval+=message;
-		return retval;
-	}
+	
 }

@@ -167,7 +167,6 @@ public class GameServer implements Runnable{
 					  }else if (playerData.startsWith("MESSAGE")){
 						  String[] playerInfo = playerData.split(",,");
 						  String pname = playerInfo[1];
-						  NetPlayer player=(NetPlayer)game.getPlayers().get(pname);	
 						  broadcast(game.toString());
 						  
 						  
