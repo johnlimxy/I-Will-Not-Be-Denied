@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import template.NetPlayer;
-
 public class GameState {
 	/**
 	 * This is a map(key-value pair) of <player name,NetPlayer>
@@ -22,9 +20,9 @@ public class GameState {
 	 * @param name
 	 * @param player
 	 */
-	public void update(String name, NetPlayer player){
-		players.put(name,player);
-	}
+	// public void update(String name, NetPlayer player){
+	// 	players.put(name,player);
+	// }
 	
 	/**
 	 * String representation of this object. Used for data transfer

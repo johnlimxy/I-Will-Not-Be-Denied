@@ -63,27 +63,27 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 
 	
 	
-	public void shoot(double mouseX, double mouseY) {
-		// getting position
-		if (this.ammo > 0) {
-			int x = (int) (this.positionX + Fubuchan.SHIP.getWidth() - 10);
-			int y = (int) (this.positionY + Fubuchan.SHIP.getHeight()/3);
+	// public void shoot(double mouseX, double mouseY) {
+	// 	// getting position
+	// 	if (this.ammo > 0) {
+	// 		int x = (int) (this.positionX + Fubuchan.SHIP.getWidth() - 10);
+	// 		int y = (int) (this.positionY + Fubuchan.SHIP.getHeight()/3);
 			
-			double m = (mouseY - y)/(mouseX - x);
+	// 		double m = (mouseY - y)/(mouseX - x);
 			
-			char orientation;
+	// 		char orientation;
 			
-			if (mouseX > x) {
-				orientation = 'E';
-			}else {
-				orientation = 'W';
-			}
+	// 		if (mouseX > x) {
+	// 			orientation = 'E';
+	// 		}else {
+	// 			orientation = 'W';
+	// 		}
 			
-			this.bullets.add(new Bullet(x, y, m, orientation, this));
+	// 		this.bullets.add(new Bullet(x, y, m, orientation, this));
 			
-			this.ammo -=1;
-		}
-	}
+	// 		this.ammo -=1;
+	// 	}
+	// }
 	
 	
 	private void checkStrength() {
@@ -93,9 +93,9 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 	}
 	
 	//Getters
-	public ArrayList<Bullet> getBulletList() {
-		return this.bullets;
-	}
+	// public ArrayList<Bullet> getBulletList() {
+	// 	return this.bullets;
+	// }
 	
 	// public boolean isAlive() {
 	// 	this.checkStrength();
@@ -216,27 +216,36 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 	public String toString(){
 		String retval="";
 		retval+="PLAYER ";
-		retval+=username+" ";
-		retval+=x+" ";
-		retval+=y+" ";
-		retval
-		retval+=orientation+" ";
-		retval+=ammo+" ";
-		retval+=strength+" ";
-		retval+=alive+" ";
+		retval+=username;
+		retval+=" ";
+		retval+=positionX;
+		retval+=" ";
+		retval+=positionY;
+		retval+=" ";
+		retval+=mouseX;
+		retval+=" ";
+		retval+=mouseY;
+		retval+=" ";
+		retval+=orientation;
+		retval+=" ";
+		retval+=ammo;
+		retval+=" ";
+		retval+=strength;
+		retval+=" ";
+		retval+=alive;
 
 		return retval;
 	}
 	/**
 	 * String representation. used for transfer over the network
 	 */
-	public String messageToString(){
-		String retval="";
-		retval+="MESSAGE ";
-		retval+=username+" ";
-		retval+=message;
-		return retval;
-	}
+	// public String messageToString(){
+	// 	String retval="";
+	// 	retval+="MESSAGE ";
+	// 	retval+=username+" ";
+	// 	retval+=message;
+	// 	return retval;
+	// }
 }
 
 	
