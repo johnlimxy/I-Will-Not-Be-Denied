@@ -101,8 +101,9 @@ public class GameTimer extends AnimationTimer implements Runnable{
 	
 	// Initialize method
 	public void init() {
-		// // Adding the ship
-		// this.ship = new Fubuchan(150, 200);
+		// // Adding the player
+		 this.player = new Fubuchan(150, 200,this.name);
+		 this.player.setName(this.name);
 		
 		
 		// crosshair
@@ -111,40 +112,39 @@ public class GameTimer extends AnimationTimer implements Runnable{
 	
 	// Process input method
 	private void processInput() {
-		Moving ship and bullets
-		Fubuchan ship = this.ship;
+//		Moving player and bullets
+		Fubuchan player = this.player;
 		Crosshair crosshair = this.crosshair;
 		this.scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent e) {
 				KeyCode code = e.getCode();
-				prevX=ship.getX();prevY=ship.getY();
+				prevX=player.getX();prevY=player.getY();
 			
 				// Possible movements
 				if (code == KeyCode.W) {
-					ship.setdY(-Fubuchan.SHIP_SPEED);
-					ship.setOrientation('W');
+					player.setdY(-Fubuchan.SHIP_SPEED);
+					player.setOrientation('W');
 				}
 			
 				if (code == KeyCode.S) {
-					ship.setdY(Fubuchan.SHIP_SPEED);
-					ship.setOrientation('E');
+					player.setdY(Fubuchan.SHIP_SPEED);
+					player.setOrientation('E');
 				}
 			
 				if (code == KeyCode.A) { 
-					ship.setdX(-Fubuchan.SHIP_SPEED);
-					ship.setOrientation('W');
+					player.setdX(-Fubuchan.SHIP_SPEED);
+					player.setOrientation('W');
 				}
 			
 				if (code == KeyCode.D) {
-					ship.setdX(Fubuchan.SHIP_SPEED);
-					ship.setOrientation('E');
+					player.setdX(Fubuchan.SHIP_SPEED);
+					player.setOrientation('E');
 				}
 				// Logging movements
 				System.out.println(code + " key pressed.");
 			
-				if (prevX != x || prevY != y){
-					send("PLAYER "+name+" "+x+" "+y);
-				}
+				
+				
 			
 
 			}
@@ -153,37 +153,37 @@ public class GameTimer extends AnimationTimer implements Runnable{
 		this.scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent e) {
 				// Stopping movements
-				ship.setdX(0);
-				ship.setdY(0);
-				ship.setOrientation(' ');
+				player.setdX(0);
+				player.setdY(0);
+				player.setOrientation(' ');
 			}
 		});
 		
-		this.scene.setOnMouseMoved(new EventHandler<MouseEvent>() {
-			public void handle(MouseEvent e) {
-				crosshair.setdXdY(e.getX(), e.getY());
+//		this.scene.setOnMouseMoved(new EventHandler<MouseEvent>() {
+//			public void handle(MouseEvent e) {
+//				crosshair.setdXdY(e.getX(), e.getY());
+//		
+//				System.out.println("MOUSE X : " + e.getX() + " MOUSE Y : " + e.getY());
+//				if (prevXM != e.getX() || prevYM != e.getY()){
+//					send("PLAYER MOUSE"+name+" "+e.getX()+" "+e.getX());
+//				}
+//			}
+//		});
 		
-				System.out.println("MOUSE X : " + e.getX() + " MOUSE Y : " + e.getY());
-				if (prevXM != e.getX() || prevYM != e.getY()){
-					send("PLAYER MOUSE"+name+" "+e.getX()+" "+e.getX());
-				}
-			}
-		});
-		
-		this.scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			public void handle(MouseEvent e) {
-				crosshair.setdXdY(e.getX(), e.getY());
-				ship.shoot(e.getX(), e.getY());
-			}
-		});
+//		this.scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//			public void handle(MouseEvent e) {
+//				crosshair.setdXdY(e.getX(), e.getY());
+//				player.shoot(e.getX(), e.getY());
+//			}
+//		});
 		
 		// flame thrower 
-		this.scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
-			public void handle(MouseEvent e) {
-				crosshair.setdXdY(e.getX(), e.getY());
-				ship.shoot(e.getX(), e.getY());
-			}
-		});
+//		this.scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
+//			public void handle(MouseEvent e) {
+//				crosshair.setdXdY(e.getX(), e.getY());
+//				player.shoot(e.getX(), e.getY());
+//			}
+//		});
 	}
 	
 	// Update method
@@ -192,11 +192,12 @@ public class GameTimer extends AnimationTimer implements Runnable{
 		this.inGameTime = (int) (System.currentTimeMillis() - this.gameStart) / 1000;
 		
 		// moving sprites
-		// this.ship.move();
+		this.player.move();
 		this.crosshair.move();
+		 send("PLAYER " + name + " " + player.getX() + " " + player.getY());
 		
 		
-		// for (Bullet b : this.ship.getBulletList()) {
+		// for (Bullet b : this.player.getBulletList()) {
 		// 	b.move();
 		// }
 
@@ -224,16 +225,19 @@ public class GameTimer extends AnimationTimer implements Runnable{
 		
 		// rendering scoreboard
 		this.drawScoreboard();
+		for (Iterator<Fubuchan> i = this.players.iterator(); i.hasNext(); ) {
+			Fubuchan f = i.next();
+			f.render(this.gc);
+		}
+//		 rendering the units
 		
-		// rendering the units
-		// this.ship.render(this.gc);
 		
 		// render crosshair
 		this.crosshair.render(this.gc);
 		
 		
 		// rendering bullets
-		// for (Bullet bullets : this.ship.getBulletList()) {
+		// for (Bullet bullets : this.player.getBulletList()) {
 		// 	bullets.render(this.gc);
 		// }
 		
@@ -243,7 +247,7 @@ public class GameTimer extends AnimationTimer implements Runnable{
 	// 	// Using iterator to avoid ConcurrencyModificationException
 	// 	for (Iterator<Fish> i = this.fishes.iterator(); i.hasNext(); ) {
 	// 		Fish f = i.next();
-	// 		for (Iterator<Bullet> j = this.ship.getBulletList().iterator(); j.hasNext(); ) {
+	// 		for (Iterator<Bullet> j = this.player.getBulletList().iterator(); j.hasNext(); ) {
 	// 			Bullet b = j.next();
 				
 	// 			if (b.collidesWith(f)) {
@@ -258,13 +262,13 @@ public class GameTimer extends AnimationTimer implements Runnable{
 	// 			}
 	// 		}
 			
-	// 		if (f.collidesWith(this.ship)) {
-	// 			// fish deals damage to ship and is removed
-	// 			f.doDamage(this.ship);
+	// 		if (f.collidesWith(this.player)) {
+	// 			// fish deals damage to player and is removed
+	// 			f.doDamage(this.player);
 	// 			i.remove();
 				
-	// 			// if ship is destroyed, end the game
-	// 			if (!this.ship.isAlive()) {
+	// 			// if player is destroyed, end the game
+	// 			if (!this.player.isAlive()) {
 	// 				this.stop();
 	// 				this.gs.setGameOver(0);
 	// 				System.out.println("Game Over");
@@ -275,16 +279,16 @@ public class GameTimer extends AnimationTimer implements Runnable{
 	// 	for (Iterator<PowerUp> k = this.powerUps.iterator(); k.hasNext(); ) {
 	// 		PowerUp p = k.next();
 			
-	// 		if (p.collidesWith(this.ship)) {
-	// 			// p modifies the ship's stats
-	// 			p.modifyShip(this.ship);
+	// 		if (p.collidesWith(this.player)) {
+	// 			// p modifies the player's stats
+	// 			p.modifyplayer(this.player);
 	// 			k.remove();
 	// 		}
 	// 	}
 	// }
 	
 	// private void cleanBullets() {
-	// 	for (Iterator<Bullet> j = this.ship.getBulletList().iterator(); j.hasNext(); ) {
+	// 	for (Iterator<Bullet> j = this.player.getBulletList().iterator(); j.hasNext(); ) {
 	// 		Bullet b = j.next();
 			
 	// 		if (b.getPositionX() + Bullet.BULLET.getWidth() > GameStage.WINDOW_WIDTH) {
@@ -296,11 +300,11 @@ public class GameTimer extends AnimationTimer implements Runnable{
 	private void drawScoreboard() {
 		this.gc.setFont(Font.font("Calibri", 30));
 		this.gc.fillText("Strength: ", 10, 30);
-		// this.gc.fillText(Integer.toString(this.ship.getStrength()), 140, 30);
+		// this.gc.fillText(Integer.toString(this.player.getStrength()), 140, 30);
 		this.gc.fillText("Time: ", GameStage.WINDOW_WIDTH / 2 - 60, 30);
 		this.gc.fillText(Integer.toString(this.inGameTime), GameStage.WINDOW_WIDTH / 2 + 30, 30);
 		this.gc.fillText("Score: ", GameStage.WINDOW_WIDTH - 140, 30);
-		// this.gc.fillText(Integer.toString(this.ship.getScore()), GameStage.WINDOW_WIDTH - 40, 30);
+		// this.gc.fillText(Integer.toString(this.player.getScore()), GameStage.WINDOW_WIDTH - 40, 30);
 	}
 
 	
@@ -347,7 +351,7 @@ public class GameTimer extends AnimationTimer implements Runnable{
                         int y = Integer.parseInt(playerInfo[3]);
                         // player.setX(x);
                         // player.setY(y);
-//                        updatePlayerPosition(pname, x, y);
+                        updatePlayerPosition(pname, x, y);
 
                     }
                     //show the changes
@@ -368,7 +372,7 @@ public class GameTimer extends AnimationTimer implements Runnable{
 			}
 		}
 		// If player not found, create a new player object and add it to the list
-		Fubuchan newPlayer = new Fubuchan(position);
+		Fubuchan newPlayer = new Fubuchan(200, 150, pname);
 		players.add(newPlayer);
 	}
 }
@@ -379,4 +383,4 @@ public class GameTimer extends AnimationTimer implements Runnable{
 
 
 
-}
+

@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import template.NetPlayer;
+
 public class GameState {
 	/**
 	 * This is a map(key-value pair) of <player name,NetPlayer>
