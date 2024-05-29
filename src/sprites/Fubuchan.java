@@ -2,6 +2,7 @@ package sprites;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.net.InetAddress;
 
 import javafx.scene.image.Image;
 import template.GameStage;
@@ -19,10 +20,13 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 	private int ammo;
 	private int score;
 	private boolean invincible;
+	private int port;
+	private InetAddress address;
+	private String username;
 	
 	private char orientation;
 	
-	public Fubuchan(double positionX, double positionY) {	//Constructor
+	public Fubuchan(double positionX, double positionY, String username,InetAddress address, int port) {	//Constructor
 		super(positionX, positionY);
 		Random r = new Random();
 		this.strength = r.nextInt(51) + 100;
@@ -33,6 +37,9 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 		this.invincible = false;
 		this.orientation = 'E';
 		this.ammo = 10;
+		this.address = address;
+		this.port = port;
+		this.username = username;
 	}
 	
 	public void move() {
@@ -51,6 +58,7 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 	public void reload() {
 		this.ammo = 10;
 	}
+	
 	
 	public void shoot(double mouseX, double mouseY) {
 		// getting position
@@ -113,6 +121,10 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 	public char getOrientation() {
 		return this.orientation;
 	}
+
+	public int getScore(int score){
+		return this.score;
+	}
 	
 	//Setters
 	void setStrength(int strength) {
@@ -142,4 +154,34 @@ public class Fubuchan extends Sprite { //Equivalent to ship
 			}
 		}
 	}
+
+	/**
+	 * Returns the address
+	 * @return
+	 */
+	public InetAddress getAddress(){
+		return address;
+	}
+
+	public String toString(){
+		String retval="";
+		retval+="PLAYER ";
+		retval+=username+" ";
+		retval+=x+" ";
+		retval+=y;
+		return retval;
+	}
+	/**
+	 * String representation. used for transfer over the network
+	 */
+	public String messageToString(){
+		String retval="";
+		retval+="MESSAGE ";
+		retval+=username+" ";
+		retval+=message;
+		return retval;
+	}
 }
+
+	
+	
