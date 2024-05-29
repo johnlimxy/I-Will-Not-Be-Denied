@@ -398,8 +398,8 @@ public class GameStage {
 		Scene gameScene = new Scene(root);
 		
 		// Starting the game
-		this.waitinglobby = new WaitingLobby(stage,server,name);
-		this.waitinglobby.run();
+		this.gametimer = new GameTimer(stage,server,name);
+		this.gametimer.start();
 		
 		
 		return gameScene;
