@@ -37,10 +37,10 @@ public class Bullet extends Sprite {
 		
 	}
 	
-	public void doDamage(Fish f) {
-		f.setHealth(f.getHealth() - this.damage);
-		this.ship.setScore(this.ship.getScore() + 1);
-	}
+	// public void doDamage(Fish f) {
+	// 	f.setHealth(f.getHealth() - this.damage);
+	// 	this.ship.setScore(this.ship.getScore() + 1);
+	// }
 	
 	//Getters
 	public int getPositionX() {

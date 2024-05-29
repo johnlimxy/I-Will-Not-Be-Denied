@@ -32,6 +32,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+
 public class GameStage {
 	// Class Attributes
 	public final static Image BG = new Image("assets/test.png");
@@ -397,8 +398,8 @@ public class GameStage {
 		Scene gameScene = new Scene(root);
 		
 		// Starting the game
-		this.gametimer = new GameTimer(gc, gameScene, this, server,name);
-		this.gametimer.start();
+		this.waitinglobby = new WaitingLobby(stage,server,name);
+		this.waitinglobby.run();
 		
 		
 		return gameScene;

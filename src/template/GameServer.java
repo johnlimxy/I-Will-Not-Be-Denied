@@ -3,9 +3,7 @@ package template;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * The main game server. It just accepts the messages sent by one player to
@@ -132,7 +130,7 @@ public class GameServer implements Runnable{
 							String tokens[] = playerData.split(" ");
 							NetPlayer player=new NetPlayer(tokens[1],packet.getAddress(),packet.getPort());
 							System.out.println("Player connected: "+tokens[1]);
-							game.update(tokens[1].trim(),player);
+							//game.update(tokens[1].trim(),player);
 							broadcast("CONNECTED "+tokens[1]);
 							playerCount++;
 							if (playerCount==numPlayers){
@@ -161,7 +159,7 @@ public class GameServer implements Runnable{
 						  player.setX(x);
 						  player.setY(y);
 						  //Update the game state
-						  game.update(pname, player);
+						  //game.update(pname, player);
 						  //Send to all the updated game state
 						  broadcast(game.toString());
 					  }else if (playerData.startsWith("MESSAGE")){
